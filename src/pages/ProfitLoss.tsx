@@ -215,7 +215,7 @@ const ProfitLoss = () => {
             </p>
             <Button variant="outline" size="sm" className="h-7 text-xs">Review</Button>
             <Button variant="ghost" size="sm" className="h-7 w-7 p-0" onClick={handleSendBannerTelegram}>
-              <Send className="h-3.5 w-3.5 text-muted-foreground" />
+              <Send className="lucide lucide-send h-3.5 w-3.5 text-muted-foreground text-slate-300" />
             </Button>
             <button onClick={() => setShowBanner(false)} className="p-1 hover:bg-muted rounded">
               <X className="h-3.5 w-3.5 text-muted-foreground" />
