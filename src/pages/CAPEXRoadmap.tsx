@@ -31,7 +31,7 @@ function Sparkline({ predicted, actual }: { predicted: number[]; actual: number[
   }));
 
   return (
-    <div className="w-28 h-8">
+    <div className="w-28 h-8 border border-solid">
       <ResponsiveContainer width="100%" height="100%">
         <LineChart data={data} margin={{ top: 2, right: 2, bottom: 2, left: 2 }}>
           <Line type="monotone" dataKey="predicted" stroke="hsl(35, 12%, 75%)" strokeWidth={1} strokeDasharray="3 3" dot={false} />
