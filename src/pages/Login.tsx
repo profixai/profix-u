@@ -35,7 +35,7 @@ const Login = () => {
       const role = username === "inventory" ? "inventory" : username === "manager" ? "manager" : "direction";
       navigate(roleHome[role] || "/overview");
     } else {
-      toast.error("Invalid credentials. Try: inventory/inv2026, manager/mgr2026, or direction/dir2026");
+      toast.error("Invalid username or password.");
     }
   };
 
