@@ -1,0 +1,27 @@
+{
+  "ci": {
+    "collect": {
+      "url": ["http://localhost:4173/"],
+      "numberOfRuns": 3,
+      "settings": {
+        "preset": "desktop",
+        "chromeFlags": "--no-sandbox --headless=new"
+      }
+    },
+    "assert": {
+      "assertions": {
+        "categories:performance": ["warn", { "minScore": 0.85 }],
+        "categories:seo": ["error", { "minScore": 0.95 }],
+        "categories:accessibility": ["warn", { "minScore": 0.9 }],
+        "categories:best-practices": ["warn", { "minScore": 0.9 }],
+
+        "uses-long-cache-ttl": ["error", { "maxLength": 0 }],
+        "render-blocking-resources": ["warn", { "maxLength": 0 }],
+        "unused-javascript": "off"
+      }
+    },
+    "upload": {
+      "target": "temporary-public-storage"
+    }
+  }
+}

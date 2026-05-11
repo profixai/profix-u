@@ -1,146 +1,65 @@
+## Goal
 
+Add an automated Lighthouse audit to GitHub Actions CI so SEO/performance regressions (especially cache-lifetime headers) are surfaced on every pull request and on pushes to `main`.
 
-## UI Finalization: Role-Based Workflow Product
+## Approach
 
-This plan turns the current "SaaS catalogue" feel into a focused, role-based B2B workflow tool across 5 changes. No backend or data contract changes.
+Use the official **Lighthouse CI** action (`treosh/lighthouse-ci-action`) running against the production preview build served locally by `vite preview`. This avoids depending on the deployed Lovable URL (which can be flaky in CI) and audits the same artifact users will receive.
 
----
+A new `lighthouse` job is added to `.github/workflows/ci.yml`, running in parallel with the existing `web` job. A `lighthouserc.json` file at the repo root configures thresholds and the specific audits we want to gate on — most importantly `uses-long-cache-ttl` — so the workflow fails when caching regressions reappear.
 
-### Change 1: Role-Based UX
+## Files
 
-**Map existing roles to the new UX contexts:**
-- `inventory` = Operator (sees: P&L, Insights, Data Upload, Settings)
-- `manager` = Manager (sees: Overview, Dashboard, P&L, Insights, Data Upload, Portfolio, Settings)
-- `direction` = Admin (sees: everything including `/why-profix`)
+- **New** `.github/workflows/ci.yml` — add `lighthouse` job (kept separate from `web` to avoid blocking type/test feedback).
+- **New** `lighthouserc.json` — Lighthouse CI assertion config.
 
-**Files:**
-- `src/components/AppShell.tsx` — Rewrite `navSections` to remove the section-label structure and replace with a flat filtered list. Remove Enterprise nav item for non-direction roles. Add `/why-profix` only for `direction`.
-- `src/App.tsx` — Add route for `/why-profix`. Update `allowedRoles` on `/enterprise` to `["direction"]` only. Update `RootRedirect`: inventory → `/inventory`, manager → `/dashboard`, direction → `/overview`.
-
-**No changes to AuthContext or role types** — the three existing roles map directly.
-
----
-
-### Change 2: Overview Page Refactor
-
-**File: `src/pages/Overview.tsx` — Full rewrite**
-
-Keep only:
-1. **North Star KPI** — single prominent card (e.g. "GOP Margin: 42.8%") with delta badge
-2. **Top 3 KPI cards** — keep existing `kpiOutcomes` but reduce to 3 operational ones (Time Saved, Anomaly Detection, Cost Variance)
-3. **"What Changed" panel** — keep the existing `changeLog` card as-is
-4. **"Next Best Action" panel** — new Card with a single recommended action (e.g. "Review F&B costs — 2 alerts pending") and a CTA button to navigate to the relevant page
-5. **"Data Status" panel** — new Card showing last sync time, files uploaded this month, pending anomalies
-
-Remove:
-- Hero value statement / tagline
-- "Upgrade to Team" prompt
-- `CompetitiveComparison`
-- `FeatureValueMatrix`
-- `PackagingTiers`
-- All imports for those removed components
-
----
-
-### Change 3: Move Sales Content to `/why-profix`
-
-**File: `src/pages/WhyProfix.tsx` — Create new**
-
-A dedicated page containing:
-- `CompetitiveComparison`
-- `FeatureValueMatrix` with `featureValueMatrix` data
-- `PackagingTiers` with `packageTiers` data
-- The existing Enterprise trust/governance content from `Enterprise.tsx` (audit metrics, `EnterpriseTrustPanel`)
-
-Wrapped in `AppShell`. Only accessible to `direction` role.
-
-**File: `src/pages/Enterprise.tsx`** — Simplify to just governance controls (audit metrics, security score). Remove `CompetitiveComparison` and `PackagingTiers` from this page. Keep `EnterpriseTrustPanel`.
-
-**File: `src/components/AppShell.tsx`** — Add "Why Profix" nav item for `direction` only.
-
-**File: `src/App.tsx`** — Add `<Route path="/why-profix">` with `allowedRoles={["direction"]}`.
-
----
-
-### Change 4: Error Handling UI Components
-
-**File: `src/components/ui/states.tsx` — Create new**
-
-Four reusable components:
+## Workflow steps (new `lighthouse` job)
 
 ```text
-LoadingState  — Skeleton grid + "Loading..." text
-EmptyState    — Icon + message + action button (e.g. "Upload data")
-ErrorState    — AlertTriangle icon + human message + Retry button (onRetry callback)
-DisconnectedState — WifiOff icon + "Connection lost" + Retry
+checkout → setup Bun → install → bun run build
+        → start `bunx vite preview --port 4173` in background
+        → wait-on http://localhost:4173
+        → treosh/lighthouse-ci-action@v12 (3 runs, desktop + mobile)
+        → upload HTML reports as workflow artifact
 ```
 
-All use existing Card, Button, Badge from the design system.
+## `lighthouserc.json` (key assertions)
 
-**Apply to pages:**
-- `src/pages/ProfitLoss.tsx` — Wrap loading skeleton with `LoadingState`, add `ErrorState` when `usePL` fails, add `EmptyState` when data is null/empty after load
-- `src/pages/Insights.tsx` — Same pattern with `useInsights`
-- `src/pages/MultiProperty.tsx` — Same pattern with `useMultiProperty`
-- `src/pages/DataVault.tsx` — Add `EmptyState` when no files exist ("Upload your first P&L file to get started")
+```json
+{
+  "ci": {
+    "collect": {
+      "url": ["http://localhost:4173/"],
+      "numberOfRuns": 3,
+      "settings": { "preset": "desktop" }
+    },
+    "assert": {
+      "assertions": {
+        "categories:performance": ["warn", { "minScore": 0.85 }],
+        "categories:seo":         ["error", { "minScore": 0.95 }],
+        "categories:accessibility":["warn", { "minScore": 0.9 }],
+        "categories:best-practices":["warn", { "minScore": 0.9 }],
 
-**Update hooks** (`usePL`, `useInsights`, `useMultiProperty`) to expose an `error` field if not already present, by catching fetch errors.
-
----
-
-### Change 5: Global Context Bar
-
-**File: `src/components/ContextBar.tsx` — Create new**
-
-A sticky bar (height ~36px) rendered below the header in `AppShell`, containing:
-- **Property selector** (Select dropdown, default "Le Grand Hôtel") — visible for manager/direction
-- **Reporting period** badge (e.g. "Dec 2024 · Monthly")
-- **Data freshness** indicator (green dot + "Synced 2h ago" or amber + "Stale — 3 days")
-- **Role badge** (already exists in header — move here for prominence)
-
-For `inventory` role: show only property name (read-only) + role badge.
-
-**File: `src/contexts/PropertyContext.tsx` — Create new**
-
-```typescript
-interface PropertyContextType {
-  propertyId: string;
-  propertyName: string;
-  setProperty: (id: string, name: string) => void;
-  period: { year: number; month: string; granularity: "daily" | "monthly" | "ytd" };
-  setPeriod: (p: ...) => void;
+        "uses-long-cache-ttl":     ["error", { "maxLength": 0 }],
+        "render-blocking-resources":["warn", { "maxLength": 0 }],
+        "unused-javascript":       "off"
+      }
+    },
+    "upload": { "target": "temporary-public-storage" }
+  }
 }
 ```
 
-Wrap in `App.tsx` inside `AuthProvider`. All pages that currently have local property/period selectors (ProfitLoss, Dashboard, MultiProperty) will read from this shared context instead of local state.
+`uses-long-cache-ttl` is set as **error** so any future asset shipped with a short cache header fails CI — directly addressing the regression class you flagged. Lovable-hosted infra assets (`cdn.gpteng.co`, `~flock.js`) are not present when auditing the local preview, so they cannot cause false negatives.
 
-**File: `src/components/AppShell.tsx`** — Render `<ContextBar />` between `<header>` and `<main>`.
+## Severity tuning
 
-**File: `src/pages/ProfitLoss.tsx`** — Remove local property/year/month/period state. Read from `PropertyContext`. Keep the sticky filter bar but remove the property selector (it's now in the context bar). Keep period tabs since they're page-specific overrides.
+- **error (blocks PR merge):** SEO score, `uses-long-cache-ttl`.
+- **warn (visible but non-blocking):** performance / a11y / best-practices scores, render-blocking resources.
 
-**File: `src/pages/Dashboard.tsx`** — Remove inline hotel selector from `DirectionDashboard`. Read property from context.
+This mirrors your existing pattern of leaving `lint` as `continue-on-error` while keeping correctness gates (type-check, build, tests) hard. Thresholds can be ratcheted up later once a baseline is established.
 
----
+## Out of scope
 
-### Summary of files
-
-| Action | File |
-|--------|------|
-| Create | `src/components/ui/states.tsx` |
-| Create | `src/components/ContextBar.tsx` |
-| Create | `src/contexts/PropertyContext.tsx` |
-| Create | `src/pages/WhyProfix.tsx` |
-| Edit | `src/components/AppShell.tsx` |
-| Edit | `src/App.tsx` |
-| Edit | `src/pages/Overview.tsx` |
-| Edit | `src/pages/Enterprise.tsx` |
-| Edit | `src/pages/ProfitLoss.tsx` |
-| Edit | `src/pages/Dashboard.tsx` |
-| Edit | `src/pages/Insights.tsx` |
-| Edit | `src/pages/MultiProperty.tsx` |
-| Edit | `src/pages/DataVault.tsx` |
-| Edit | `src/hooks/usePL.ts` |
-| Edit | `src/hooks/useInsights.ts` |
-| Edit | `src/hooks/useMultiProperty.ts` |
-
-No backend, data contract, or styling system changes.
-
+- Auditing the deployed Lovable preview URL (would require a secret + deploy wait; can be added later as a nightly cron job).
+- Historical trend storage via Lighthouse CI Server (temporary public storage is sufficient for PR review links).
