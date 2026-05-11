@@ -16,7 +16,11 @@ import {
   Menu,
   X,
   ChevronDown,
+  Crown,
 } from "lucide-react";
+import { useTier, type Tier } from "@/contexts/TierContext";
+
+const tierLabel: Record<Tier, string> = { free: "Free", team: "Team", enterprise: "Enterprise" };
 import {
   DropdownMenu,
   DropdownMenuContent,
