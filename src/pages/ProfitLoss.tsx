@@ -22,7 +22,6 @@ import { sendTelegramMessage, formatInsightMessage, getTelegramConfig } from "@/
 import { toast } from "sonner";
 import { useProperty } from "@/contexts/PropertyContext";
 import { useTier } from "@/contexts/TierContext";
-import { useNavigate as useNav } from "react-router-dom";
 import { Lock } from "lucide-react";
 
 const fmt = (v: number, f: string) => {
@@ -93,6 +92,9 @@ const ProfitLoss = () => {
   const [month, setMonth] = useState(period.month);
   const [showBanner, setShowBanner] = useState(true);
   const navigate = useNavigate();
+  const { hasTier } = useTier();
+  const hasHistory = hasTier("team");
+  const canExport = hasTier("team");
 
   const { data, loading, error } = usePL({
     property: propertyId,
@@ -107,6 +109,10 @@ const ProfitLoss = () => {
 
   const exportCSV = () => {
     if (!data) return;
+    if (!canExport) {
+      navigate("/upgrade");
+      return;
+    }
     const headers = ["Line Item", "Actual", "Budget", "Variance €", "Variance %"];
     const flatten = (rows: PLRowType[]): string[][] =>
       rows.flatMap((r) => {
