@@ -41,7 +41,7 @@ const MiniSparkline = ({ data }: { data: number[] }) => {
     .map((v, i) => `${(i / (data.length - 1)) * w},${h - ((v - min) / range) * h}`)
     .join(" ");
   return (
-    <svg width={w} height={h} className="inline-block">
+    <svg width={w} height={h} className="inline-block border border-solid">
       <polyline points={points} fill="none" stroke="hsl(var(--primary))" strokeWidth="1.5" />
     </svg>
   );
