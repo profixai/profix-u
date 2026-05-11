@@ -1,10 +1,23 @@
-import { Bell } from "lucide-react";
+import { Bell, Crown } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { useAuth } from "@/contexts/AuthContext";
-import { Badge } from "@/components/ui/badge";
+import { useTier, type Tier } from "@/contexts/TierContext";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+
+const tierLabel: Record<Tier, string> = { free: "Free", team: "Team", enterprise: "Enterprise" };
 
 export const TopBar = () => {
   const { user } = useAuth();
+  const { tier, setTier } = useTier();
+  const navigate = useNavigate();
 
   return (
     <header className="h-12 border-b bg-card flex items-center justify-between px-5 shrink-0">
@@ -13,7 +26,31 @@ export const TopBar = () => {
         <h1 className="text-sm font-semibold text-foreground">Dashboard</h1>
       </div>
 
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-3">
+        <DropdownMenu>
+          <DropdownMenuTrigger className="inline-flex items-center gap-1.5 rounded-md border bg-background px-2 py-1 text-[11px] text-muted-foreground hover:bg-muted transition">
+            <Crown className="h-3 w-3 text-primary" />
+            {tierLabel[tier]} plan
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-44">
+            <DropdownMenuLabel className="text-[11px]">Demo: switch tier</DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            {(["free", "team", "enterprise"] as Tier[]).map((t) => (
+              <DropdownMenuItem
+                key={t}
+                onClick={() => setTier(t)}
+                className={`text-xs ${t === tier ? "font-semibold text-primary" : ""}`}
+              >
+                {tierLabel[t]}
+              </DropdownMenuItem>
+            ))}
+            <DropdownMenuSeparator />
+            <DropdownMenuItem className="text-xs" onClick={() => navigate("/upgrade")}>
+              See plans →
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+
         {user && (
           <span className="text-xs text-muted-foreground hidden sm:block">
             {user.displayName}
