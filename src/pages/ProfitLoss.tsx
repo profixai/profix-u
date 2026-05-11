@@ -21,6 +21,9 @@ import { PLRow as PLRowType } from "@/services/api";
 import { sendTelegramMessage, formatInsightMessage, getTelegramConfig } from "@/services/telegram";
 import { toast } from "sonner";
 import { useProperty } from "@/contexts/PropertyContext";
+import { useTier } from "@/contexts/TierContext";
+import { useNavigate as useNav } from "react-router-dom";
+import { Lock } from "lucide-react";
 
 const fmt = (v: number, f: string) => {
   if (f === "pct") return `${v}%`;
