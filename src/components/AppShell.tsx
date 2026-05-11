@@ -16,7 +16,11 @@ import {
   Menu,
   X,
   ChevronDown,
+  Crown,
 } from "lucide-react";
+import { useTier, type Tier } from "@/contexts/TierContext";
+
+const tierLabel: Record<Tier, string> = { free: "Free", team: "Team", enterprise: "Enterprise" };
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -52,6 +56,7 @@ interface AppShellProps {
 
 export const AppShell = ({ children }: AppShellProps) => {
   const { user, role, logout } = useAuth();
+  const { tier, setTier } = useTier();
   const navigate = useNavigate();
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -113,6 +118,32 @@ export const AppShell = ({ children }: AppShellProps) => {
 
         {/* ── Right section ─────────────────────────────────── */}
         <div className="flex items-center gap-3">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button className="inline-flex items-center gap-1.5 rounded-md border bg-background/60 px-2 py-1 text-[11px] text-muted-foreground hover:bg-secondary transition">
+                <Crown className="h-3 w-3 text-primary" />
+                {tierLabel[tier]} plan
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-44">
+              <div className="px-2 py-1.5 border-b">
+                <p className="text-[10px] text-muted-foreground uppercase tracking-wide">Demo: switch tier</p>
+              </div>
+              {(["free", "team", "enterprise"] as Tier[]).map((t) => (
+                <DropdownMenuItem
+                  key={t}
+                  onClick={() => setTier(t)}
+                  className={`text-xs ${t === tier ? "font-semibold text-primary" : ""}`}
+                >
+                  {tierLabel[t]}
+                </DropdownMenuItem>
+              ))}
+              <DropdownMenuItem className="text-xs border-t" onClick={() => navigate("/upgrade")}>
+                See plans →
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
           <button className="relative p-1.5 rounded-md hover:bg-secondary transition-colors">
             <Bell className="h-4 w-4 text-muted-foreground" />
             <span className="absolute -top-0.5 -right-0.5 h-3.5 w-3.5 rounded-full bg-destructive text-[9px] font-semibold flex items-center justify-center text-destructive-foreground">

@@ -21,6 +21,8 @@ import { PLRow as PLRowType } from "@/services/api";
 import { sendTelegramMessage, formatInsightMessage, getTelegramConfig } from "@/services/telegram";
 import { toast } from "sonner";
 import { useProperty } from "@/contexts/PropertyContext";
+import { useTier } from "@/contexts/TierContext";
+import { Lock } from "lucide-react";
 
 const fmt = (v: number, f: string) => {
   if (f === "pct") return `${v}%`;
@@ -90,6 +92,9 @@ const ProfitLoss = () => {
   const [month, setMonth] = useState(period.month);
   const [showBanner, setShowBanner] = useState(true);
   const navigate = useNavigate();
+  const { hasTier } = useTier();
+  const hasHistory = hasTier("team");
+  const canExport = hasTier("team");
 
   const { data, loading, error } = usePL({
     property: propertyId,
@@ -104,6 +109,10 @@ const ProfitLoss = () => {
 
   const exportCSV = () => {
     if (!data) return;
+    if (!canExport) {
+      navigate("/upgrade");
+      return;
+    }
     const headers = ["Line Item", "Actual", "Budget", "Variance €", "Variance %"];
     const flatten = (rows: PLRowType[]): string[][] =>
       rows.flatMap((r) => {
@@ -156,18 +165,43 @@ const ProfitLoss = () => {
             </TabsList>
           </Tabs>
 
-          <Select value={month} onValueChange={setMonth}>
+          <Select value={month} onValueChange={hasHistory ? setMonth : () => navigate("/upgrade")}>
             <SelectTrigger className="w-28 h-8 text-xs"><SelectValue /></SelectTrigger>
             <SelectContent>
-              {["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"].map((m) => (
-                <SelectItem key={m} value={m.toLowerCase()}>{m}</SelectItem>
-              ))}
+              {["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"].map((m, i) => {
+                const locked = !hasHistory && m.toLowerCase() !== month;
+                return (
+                  <SelectItem key={m} value={m.toLowerCase()} disabled={locked}>
+                    <span className="inline-flex items-center gap-1.5">
+                      {m}
+                      {locked && <Lock className="h-2.5 w-2.5 text-muted-foreground" />}
+                    </span>
+                  </SelectItem>
+                );
+              })}
             </SelectContent>
           </Select>
 
+          {!hasHistory && (
+            <button
+              onClick={() => navigate("/upgrade")}
+              className="inline-flex items-center gap-1.5 rounded-md border border-dashed border-muted-foreground/30 bg-muted/40 px-2 py-1 text-[10px] text-muted-foreground hover:bg-muted transition"
+            >
+              <Lock className="h-3 w-3" /> 12-month history — Team
+            </button>
+          )}
+
           <div className="ml-auto">
-            <Button variant="outline" size="sm" className="h-8 text-xs gap-1.5" onClick={exportCSV} disabled={loading}>
-              <Download className="h-3.5 w-3.5" /> Export CSV
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-8 text-xs gap-1.5"
+              onClick={exportCSV}
+              disabled={loading}
+              title={canExport ? "Download CSV" : "Upgrade to Team to export"}
+            >
+              {canExport ? <Download className="h-3.5 w-3.5" /> : <Lock className="h-3.5 w-3.5" />}
+              Export CSV
             </Button>
           </div>
         </div>

@@ -19,6 +19,7 @@ import Overview from "./pages/Overview";
 import InvoiceDetail from "./pages/InvoiceDetail";
 import NotFound from "./pages/NotFound";
 import WhyProfix from "./pages/WhyProfix";
+import Upgrade from "./pages/Upgrade";
 
 const queryClient = new QueryClient();
 
@@ -47,7 +48,7 @@ const App = () => (
     <TooltipProvider>
       <AuthProvider>
         <BackendStatusProvider>
-        <TierProvider initial="team">
+        <TierProvider initial="free">
         <PropertyProvider>
           <Toaster />
           <Sonner />
@@ -64,6 +65,7 @@ const App = () => (
               <Route path="/data" element={<ProtectedRoute><DataVault /></ProtectedRoute>} />
               <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
               <Route path="/why-profix" element={<ProtectedRoute allowedRoles={["direction"]}><WhyProfix /></ProtectedRoute>} />
+              <Route path="/upgrade" element={<ProtectedRoute><Upgrade /></ProtectedRoute>} />
               {/* Invoice approval (mock data, v0 design) — reachable by URL, not in main nav */}
               <Route path="/invoices" element={<Navigate to="/invoices/INV-2024-001" replace />} />
               <Route path="/invoices/:id" element={<ProtectedRoute allowedRoles={["manager", "direction"]}><InvoiceDetail /></ProtectedRoute>} />

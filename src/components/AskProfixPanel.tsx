@@ -1,9 +1,11 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { MessageCircle, X, Send } from "lucide-react";
+import { MessageCircle, X, Send, Lock, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { useTier } from "@/contexts/TierContext";
 
 const defaultPrompts = [
   "Why did our margins drop in October?",
@@ -33,6 +35,9 @@ export const AskProfixPanel = ({
   const [internalOpen, setInternalOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
+  const navigate = useNavigate();
+  const { hasTier } = useTier();
+  const isUnlocked = hasTier("team");
 
   const open = externalOpen !== undefined ? externalOpen : internalOpen;
   const setOpen = (v: boolean) => {
@@ -101,48 +106,69 @@ export const AskProfixPanel = ({
               </div>
             )}
 
-            <div className="flex-1 overflow-auto p-4 space-y-3">
-              {messages.length === 0 ? (
-                <div className="space-y-2">
-                  <p className="text-sm text-muted-foreground">Ask me anything about your data:</p>
-                  {defaultPrompts.map((prompt) => (
-                    <button
-                      key={prompt}
-                      onClick={() => handleSend(prompt)}
-                      className="block w-full text-left text-sm px-3 py-2 rounded-md border hover:bg-muted/50 transition-colors text-foreground"
-                    >
-                      {prompt}
-                    </button>
-                  ))}
+            {!isUnlocked ? (
+              <div className="flex-1 flex flex-col items-center justify-center text-center px-6 space-y-3">
+                <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
+                  <Lock className="h-5 w-5 text-primary" />
                 </div>
-              ) : (
-                messages.map((msg, i) => (
-                  <div
-                    key={i}
-                    className={`text-sm rounded-lg px-3 py-2 ${
-                      msg.role === "user"
-                        ? "bg-primary text-primary-foreground ml-8"
-                        : "bg-muted mr-4"
-                    }`}
-                  >
-                    {msg.content}
-                  </div>
-                ))
-              )}
-            </div>
+                <h3 className="text-sm font-semibold">Ask Profix is a Team feature</h3>
+                <p className="text-xs text-muted-foreground max-w-xs">
+                  Upgrade to chat with your data — variance explanations, what-if scenarios, and natural-language drill-downs.
+                </p>
+                <Button
+                  size="sm"
+                  className="text-xs gap-1.5"
+                  onClick={() => { setOpen(false); navigate("/upgrade"); }}
+                >
+                  Upgrade to Team <ArrowRight className="h-3 w-3" />
+                </Button>
+              </div>
+            ) : (
+              <>
+                <div className="flex-1 overflow-auto p-4 space-y-3">
+                  {messages.length === 0 ? (
+                    <div className="space-y-2">
+                      <p className="text-sm text-muted-foreground">Ask me anything about your data:</p>
+                      {defaultPrompts.map((prompt) => (
+                        <button
+                          key={prompt}
+                          onClick={() => handleSend(prompt)}
+                          className="block w-full text-left text-sm px-3 py-2 rounded-md border hover:bg-muted/50 transition-colors text-foreground"
+                        >
+                          {prompt}
+                        </button>
+                      ))}
+                    </div>
+                  ) : (
+                    messages.map((msg, i) => (
+                      <div
+                        key={i}
+                        className={`text-sm rounded-lg px-3 py-2 ${
+                          msg.role === "user"
+                            ? "bg-primary text-primary-foreground ml-8"
+                            : "bg-muted mr-4"
+                        }`}
+                      >
+                        {msg.content}
+                      </div>
+                    ))
+                  )}
+                </div>
 
-            <div className="border-t p-3 flex gap-2">
-              <Input
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                placeholder="Ask about your data..."
-                onKeyDown={(e) => e.key === "Enter" && handleSend()}
-                className="text-sm"
-              />
-              <Button size="icon" onClick={() => handleSend()}>
-                <Send className="h-4 w-4" />
-              </Button>
-            </div>
+                <div className="border-t p-3 flex gap-2">
+                  <Input
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
+                    placeholder="Ask about your data..."
+                    onKeyDown={(e) => e.key === "Enter" && handleSend()}
+                    className="text-sm"
+                  />
+                  <Button size="icon" onClick={() => handleSend()}>
+                    <Send className="h-4 w-4" />
+                  </Button>
+                </div>
+              </>
+            )}
           </motion.div>
         )}
       </AnimatePresence>
