@@ -1,10 +1,11 @@
 import { useState } from "react";
-import { Pencil, Check, X } from "lucide-react";
+import { Pencil, Check, X, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import type { InvoiceExtraction, USALISplit } from "@/lib/mock-invoices";
+import { reExtractInvoice } from "@/lib/invoices-api";
 import { LabeledFieldWithConfidence } from "./LabeledFieldWithConfidence";
 import { USALIClassificationSplits } from "./USALIClassificationSplits";
 
