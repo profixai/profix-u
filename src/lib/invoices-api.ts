@@ -108,6 +108,6 @@ export async function reExtractInvoice(id: string) {
     .eq("id", id);
   if (error) throw error;
 
-  supabase.functions.invoke("extract-invoice", { body: { invoice_id: id } })
+  supabase.functions.invoke("extract-invoice", { body: { invoice_id: id, triggered_by: "manual_rerun" } })
     .catch((e) => console.error("extract-invoice invoke failed", e));
 }
