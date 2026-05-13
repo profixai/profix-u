@@ -90,7 +90,7 @@ export async function uploadInvoice(file: File, uploadedBy: string): Promise<Inv
   if (error) throw error;
 
   // Trigger extraction (fire & forget)
-  supabase.functions.invoke("extract-invoice", { body: { invoice_id: data.id } })
+  supabase.functions.invoke("extract-invoice", { body: { invoice_id: data.id, triggered_by: "upload" } })
     .catch((e) => console.error("extract-invoice invoke failed", e));
 
   return data as InvoiceRow;
@@ -108,6 +108,6 @@ export async function reExtractInvoice(id: string) {
     .eq("id", id);
   if (error) throw error;
 
-  supabase.functions.invoke("extract-invoice", { body: { invoice_id: id } })
+  supabase.functions.invoke("extract-invoice", { body: { invoice_id: id, triggered_by: "manual_rerun" } })
     .catch((e) => console.error("extract-invoice invoke failed", e));
 }
