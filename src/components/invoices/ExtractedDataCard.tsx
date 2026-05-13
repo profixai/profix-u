@@ -36,10 +36,9 @@ function toDraft(inv: InvoiceExtraction): Draft {
   };
 }
 
-export function ExtractedDataCard({ invoice }: Props) {
+export function ExtractedDataCard({ invoice, onReExtract, reExtracting }: Props) {
   const [editable, setEditable] = useState(false);
   const [draft, setDraft] = useState<Draft>(() => toDraft(invoice));
-  const [reExtracting, setReExtracting] = useState(false);
 
   const patch = <K extends keyof Draft>(key: K, value: Draft[K]) =>
     setDraft((d) => ({ ...d, [key]: value }));
@@ -53,20 +52,6 @@ export function ExtractedDataCard({ invoice }: Props) {
     toast("Invoice rejected (mock)", {
       description: "Backend not wired yet.",
     });
-  };
-
-  const handleReExtract = async () => {
-    setReExtracting(true);
-    try {
-      await reExtractInvoice(invoice.id);
-      toast.success("Re-extraction started", {
-        description: "AI is re-reading the invoice. Results will appear shortly.",
-      });
-    } catch (e: any) {
-      toast.error(e.message ?? "Re-extraction failed");
-    } finally {
-      setReExtracting(false);
-    }
   };
 
   return (
