@@ -14,7 +14,66 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      invoices: {
+        Row: {
+          amount: Json | null
+          created_at: string
+          due_date: Json | null
+          error: string | null
+          file_name: string | null
+          file_path: string
+          gl_code: Json | null
+          id: string
+          invoice_date: Json | null
+          invoice_number: Json | null
+          property_id: string
+          raw_extraction: Json | null
+          splits: Json | null
+          status: string
+          updated_at: string
+          uploaded_by: string | null
+          vendor: Json | null
+        }
+        Insert: {
+          amount?: Json | null
+          created_at?: string
+          due_date?: Json | null
+          error?: string | null
+          file_name?: string | null
+          file_path: string
+          gl_code?: Json | null
+          id?: string
+          invoice_date?: Json | null
+          invoice_number?: Json | null
+          property_id?: string
+          raw_extraction?: Json | null
+          splits?: Json | null
+          status?: string
+          updated_at?: string
+          uploaded_by?: string | null
+          vendor?: Json | null
+        }
+        Update: {
+          amount?: Json | null
+          created_at?: string
+          due_date?: Json | null
+          error?: string | null
+          file_name?: string | null
+          file_path?: string
+          gl_code?: Json | null
+          id?: string
+          invoice_date?: Json | null
+          invoice_number?: Json | null
+          property_id?: string
+          raw_extraction?: Json | null
+          splits?: Json | null
+          status?: string
+          updated_at?: string
+          uploaded_by?: string | null
+          vendor?: Json | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
