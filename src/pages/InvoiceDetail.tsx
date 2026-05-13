@@ -99,7 +99,7 @@ export default function InvoiceDetail() {
           </ResizablePanel>
           <ResizableHandle withHandle />
           <ResizablePanel defaultSize={45} minSize={30}>
-            <div className="h-full pl-2">
+            <div className="h-full pl-2 overflow-y-auto">
               {isExtracting ? (
                 <div className="flex h-full flex-col items-center justify-center gap-2 rounded-lg border border-dashed text-sm text-muted-foreground">
                   <Loader2 className="h-5 w-5 animate-spin" />
@@ -108,6 +108,9 @@ export default function InvoiceDetail() {
               ) : (
                 <ExtractedDataCard invoice={extraction} onReExtract={handleReExtract} reExtracting={reExtracting} />
               )}
+              <div className="mt-4">
+                <ExtractionHistory invoiceId={id} />
+              </div>
             </div>
           </ResizablePanel>
         </ResizablePanelGroup>
