@@ -85,7 +85,7 @@ export function ExtractedDataCard({ invoice, onReExtract, reExtracting }: Props)
               size="sm"
               className="h-8"
               disabled={reExtracting}
-              onClick={handleReExtract}
+              onClick={onReExtract}
             >
               <RefreshCw className={`mr-1.5 h-3.5 w-3.5 ${reExtracting ? "animate-spin" : ""}`} /> Re-run OCR
             </Button>
