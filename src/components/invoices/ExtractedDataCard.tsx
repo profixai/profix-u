@@ -10,6 +10,8 @@ import { USALIClassificationSplits } from "./USALIClassificationSplits";
 
 interface Props {
   invoice: InvoiceExtraction;
+  onReExtract?: () => void;
+  reExtracting?: boolean;
 }
 
 interface Draft {
