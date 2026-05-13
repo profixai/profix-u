@@ -105,7 +105,7 @@ export default function InvoiceDetail() {
                   Extracting fields with AI…
                 </div>
               ) : (
-                <ExtractedDataCard invoice={extraction} />
+                <ExtractedDataCard invoice={extraction} onReExtract={handleReExtract} reExtracting={reExtracting} />
               )}
             </div>
           </ResizablePanel>
