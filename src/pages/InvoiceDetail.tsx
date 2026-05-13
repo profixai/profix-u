@@ -16,6 +16,7 @@ export default function InvoiceDetail() {
   const [row, setRow] = useState<InvoiceRow | null>(null);
   const [src, setSrc] = useState<string>("");
   const [loading, setLoading] = useState(true);
+  const [reExtracting, setReExtracting] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
