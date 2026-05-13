@@ -54,6 +54,20 @@ export function ExtractedDataCard({ invoice }: Props) {
     });
   };
 
+  const handleReExtract = async () => {
+    setReExtracting(true);
+    try {
+      await reExtractInvoice(invoice.id);
+      toast.success("Re-extraction started", {
+        description: "AI is re-reading the invoice. Results will appear shortly.",
+      });
+    } catch (e: any) {
+      toast.error(e.message ?? "Re-extraction failed");
+    } finally {
+      setReExtracting(false);
+    }
+  };
+
   return (
     <Card className="flex h-full flex-col">
       <CardHeader className="flex flex-row items-start justify-between gap-4 border-b border-border p-4">
