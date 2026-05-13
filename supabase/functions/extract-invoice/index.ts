@@ -4,6 +4,7 @@ import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY")!;
+const MODEL = "google/gemini-2.5-flash";
 
 const EXTRACTION_PROMPT = `You are an invoice OCR engine. Extract the following fields from the attached invoice image and return ONLY valid JSON matching this schema:
 {
@@ -21,10 +22,33 @@ Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
   const supabase = createClient(SUPABASE_URL, SERVICE_KEY);
+  const startedAt = Date.now();
+  let attemptId: string | null = null;
+  let invoice_id: string | null = null;
+
+  const finishAttempt = async (status: "succeeded" | "failed", error?: string) => {
+    if (!attemptId) return;
+    await supabase.from("invoice_extraction_attempts").update({
+      status,
+      error: error ?? null,
+      finished_at: new Date().toISOString(),
+      duration_ms: Date.now() - startedAt,
+    }).eq("id", attemptId);
+  };
 
   try {
-    const { invoice_id } = await req.json();
+    const body = await req.json();
+    invoice_id = body.invoice_id;
+    const triggered_by = body.triggered_by ?? "system";
     if (!invoice_id) throw new Error("invoice_id required");
+
+    // Log attempt start
+    const { data: att } = await supabase
+      .from("invoice_extraction_attempts")
+      .insert({ invoice_id, status: "started", model: MODEL, triggered_by })
+      .select("id")
+      .single();
+    attemptId = att?.id ?? null;
 
     const { data: inv, error: invErr } = await supabase
       .from("invoices").select("*").eq("id", invoice_id).single();
@@ -34,7 +58,6 @@ Deno.serve(async (req) => {
       .storage.from("invoices").createSignedUrl(inv.file_path, 600);
     if (sErr || !signed) throw new Error("signed url failed");
 
-    // Fetch the file and convert to base64 data URL for Gemini
     const fileRes = await fetch(signed.signedUrl);
     const buf = new Uint8Array(await fileRes.arrayBuffer());
     let binary = "";
@@ -50,7 +73,7 @@ Deno.serve(async (req) => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
+        model: MODEL,
         messages: [{
           role: "user",
           content: [
@@ -68,7 +91,6 @@ Deno.serve(async (req) => {
     const aiJson = await aiRes.json();
     const text: string = aiJson.choices?.[0]?.message?.content ?? "";
 
-    // Strip markdown fences if any
     const cleaned = text.replace(/^```(?:json)?\s*/i, "").replace(/```\s*$/, "").trim();
     let parsed: any;
     try { parsed = JSON.parse(cleaned); }
@@ -94,12 +116,22 @@ Deno.serve(async (req) => {
       error: null,
     }).eq("id", invoice_id);
 
+    await finishAttempt("succeeded");
+
     return new Response(JSON.stringify({ ok: true, data: parsed }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (e) {
     console.error("extract-invoice error", e);
-    return new Response(JSON.stringify({ ok: false, error: String(e) }), {
+    const msg = e instanceof Error ? e.message : String(e);
+    await finishAttempt("failed", msg);
+    if (invoice_id) {
+      await supabase.from("invoices").update({
+        status: "extraction_failed",
+        error: msg,
+      }).eq("id", invoice_id);
+    }
+    return new Response(JSON.stringify({ ok: false, error: msg }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
