@@ -8,6 +8,7 @@ import { InvoiceLayout } from "@/components/invoices/InvoiceLayout";
 import { InvoiceHeader } from "@/components/invoices/InvoiceHeader";
 import { InvoiceViewer } from "@/components/invoices/InvoiceViewer";
 import { ExtractedDataCard } from "@/components/invoices/ExtractedDataCard";
+import { ExtractionHistory } from "@/components/invoices/ExtractionHistory";
 import { getInvoice, getSignedUrl, reExtractInvoice, rowToExtraction, type InvoiceRow } from "@/lib/invoices-api";
 import { supabase } from "@/integrations/supabase/client";
 
