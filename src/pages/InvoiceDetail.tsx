@@ -63,6 +63,20 @@ export default function InvoiceDetail() {
   const extraction = rowToExtraction(row, src);
   const isExtracting = row.status === "pending_extraction";
 
+  const handleReExtract = async () => {
+    setReExtracting(true);
+    try {
+      await reExtractInvoice(id);
+      toast.success("Re-extraction started", {
+        description: "AI is re-reading the invoice. Results will appear shortly.",
+      });
+    } catch (e: any) {
+      toast.error(e.message ?? "Re-extraction failed");
+    } finally {
+      setReExtracting(false);
+    }
+  };
+
   return (
     <InvoiceLayout>
       <div className="flex items-center gap-2 border-b border-border px-4 py-2">
