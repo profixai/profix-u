@@ -100,3 +100,14 @@ export async function updateStatus(id: string, status: "approved" | "rejected") 
   const { error } = await supabase.from("invoices").update({ status }).eq("id", id);
   if (error) throw error;
 }
+
+export async function reExtractInvoice(id: string) {
+  const { error } = await supabase
+    .from("invoices")
+    .update({ status: "pending_extraction", error: null, raw_extraction: null })
+    .eq("id", id);
+  if (error) throw error;
+
+  supabase.functions.invoke("extract-invoice", { body: { invoice_id: id } })
+    .catch((e) => console.error("extract-invoice invoke failed", e));
+}
