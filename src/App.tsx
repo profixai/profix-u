@@ -17,6 +17,7 @@ import Login from "./pages/Login";
 import ProfitLoss from "./pages/ProfitLoss";
 import Overview from "./pages/Overview";
 import InvoiceDetail from "./pages/InvoiceDetail";
+import InvoicesInbox from "./pages/InvoicesInbox";
 import NotFound from "./pages/NotFound";
 import WhyProfix from "./pages/WhyProfix";
 import Upgrade from "./pages/Upgrade";
@@ -67,7 +68,7 @@ const App = () => (
               <Route path="/why-profix" element={<ProtectedRoute allowedRoles={["direction"]}><WhyProfix /></ProtectedRoute>} />
               <Route path="/upgrade" element={<ProtectedRoute><Upgrade /></ProtectedRoute>} />
               {/* Invoice approval (mock data, v0 design) — reachable by URL, not in main nav */}
-              <Route path="/invoices" element={<Navigate to="/invoices/INV-2024-001" replace />} />
+              <Route path="/invoices" element={<ProtectedRoute allowedRoles={["manager", "direction"]}><InvoicesInbox /></ProtectedRoute>} />
               <Route path="/invoices/:id" element={<ProtectedRoute allowedRoles={["manager", "direction"]}><InvoiceDetail /></ProtectedRoute>} />
               {/* Non-MVP routes removed from navigation but kept as catch-all */}
               <Route path="*" element={<NotFound />} />
