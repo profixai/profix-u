@@ -5,12 +5,13 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import type { InvoiceExtraction, USALISplit } from "@/lib/mock-invoices";
-import { reExtractInvoice } from "@/lib/invoices-api";
 import { LabeledFieldWithConfidence } from "./LabeledFieldWithConfidence";
 import { USALIClassificationSplits } from "./USALIClassificationSplits";
 
 interface Props {
   invoice: InvoiceExtraction;
+  onReExtract?: () => void;
+  reExtracting?: boolean;
 }
 
 interface Draft {
@@ -35,10 +36,9 @@ function toDraft(inv: InvoiceExtraction): Draft {
   };
 }
 
-export function ExtractedDataCard({ invoice }: Props) {
+export function ExtractedDataCard({ invoice, onReExtract, reExtracting }: Props) {
   const [editable, setEditable] = useState(false);
   const [draft, setDraft] = useState<Draft>(() => toDraft(invoice));
-  const [reExtracting, setReExtracting] = useState(false);
 
   const patch = <K extends keyof Draft>(key: K, value: Draft[K]) =>
     setDraft((d) => ({ ...d, [key]: value }));
@@ -52,20 +52,6 @@ export function ExtractedDataCard({ invoice }: Props) {
     toast("Invoice rejected (mock)", {
       description: "Backend not wired yet.",
     });
-  };
-
-  const handleReExtract = async () => {
-    setReExtracting(true);
-    try {
-      await reExtractInvoice(invoice.id);
-      toast.success("Re-extraction started", {
-        description: "AI is re-reading the invoice. Results will appear shortly.",
-      });
-    } catch (e: any) {
-      toast.error(e.message ?? "Re-extraction failed");
-    } finally {
-      setReExtracting(false);
-    }
   };
 
   return (
@@ -99,7 +85,7 @@ export function ExtractedDataCard({ invoice }: Props) {
               size="sm"
               className="h-8"
               disabled={reExtracting}
-              onClick={handleReExtract}
+              onClick={onReExtract}
             >
               <RefreshCw className={`mr-1.5 h-3.5 w-3.5 ${reExtracting ? "animate-spin" : ""}`} /> Re-run OCR
             </Button>

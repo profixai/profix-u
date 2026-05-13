@@ -1,13 +1,14 @@
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { ArrowLeft, Loader2 } from "lucide-react";
+import { toast } from "sonner";
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable";
 import { Button } from "@/components/ui/button";
 import { InvoiceLayout } from "@/components/invoices/InvoiceLayout";
 import { InvoiceHeader } from "@/components/invoices/InvoiceHeader";
 import { InvoiceViewer } from "@/components/invoices/InvoiceViewer";
 import { ExtractedDataCard } from "@/components/invoices/ExtractedDataCard";
-import { getInvoice, getSignedUrl, rowToExtraction, type InvoiceRow } from "@/lib/invoices-api";
+import { getInvoice, getSignedUrl, reExtractInvoice, rowToExtraction, type InvoiceRow } from "@/lib/invoices-api";
 import { supabase } from "@/integrations/supabase/client";
 
 export default function InvoiceDetail() {
@@ -15,6 +16,7 @@ export default function InvoiceDetail() {
   const [row, setRow] = useState<InvoiceRow | null>(null);
   const [src, setSrc] = useState<string>("");
   const [loading, setLoading] = useState(true);
+  const [reExtracting, setReExtracting] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -61,6 +63,20 @@ export default function InvoiceDetail() {
   const extraction = rowToExtraction(row, src);
   const isExtracting = row.status === "pending_extraction";
 
+  const handleReExtract = async () => {
+    setReExtracting(true);
+    try {
+      await reExtractInvoice(id);
+      toast.success("Re-extraction started", {
+        description: "AI is re-reading the invoice. Results will appear shortly.",
+      });
+    } catch (e: any) {
+      toast.error(e.message ?? "Re-extraction failed");
+    } finally {
+      setReExtracting(false);
+    }
+  };
+
   return (
     <InvoiceLayout>
       <div className="flex items-center gap-2 border-b border-border px-4 py-2">
@@ -89,7 +105,7 @@ export default function InvoiceDetail() {
                   Extracting fields with AI…
                 </div>
               ) : (
-                <ExtractedDataCard invoice={extraction} />
+                <ExtractedDataCard invoice={extraction} onReExtract={handleReExtract} reExtracting={reExtracting} />
               )}
             </div>
           </ResizablePanel>
