@@ -93,9 +93,20 @@ export function ExtractedDataCard({ invoice }: Props) {
             </Button>
           </div>
         ) : (
-          <Button variant="outline" size="sm" className="h-8" onClick={() => setEditable(true)}>
-            <Pencil className="mr-1.5 h-3.5 w-3.5" /> Edit
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-8"
+              disabled={reExtracting}
+              onClick={handleReExtract}
+            >
+              <RefreshCw className={`mr-1.5 h-3.5 w-3.5 ${reExtracting ? "animate-spin" : ""}`} /> Re-run OCR
+            </Button>
+            <Button variant="outline" size="sm" className="h-8" onClick={() => setEditable(true)}>
+              <Pencil className="mr-1.5 h-3.5 w-3.5" /> Edit
+            </Button>
+          </div>
         )}
       </CardHeader>
 
