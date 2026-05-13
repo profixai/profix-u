@@ -38,6 +38,7 @@ function toDraft(inv: InvoiceExtraction): Draft {
 export function ExtractedDataCard({ invoice }: Props) {
   const [editable, setEditable] = useState(false);
   const [draft, setDraft] = useState<Draft>(() => toDraft(invoice));
+  const [reExtracting, setReExtracting] = useState(false);
 
   const patch = <K extends keyof Draft>(key: K, value: Draft[K]) =>
     setDraft((d) => ({ ...d, [key]: value }));
