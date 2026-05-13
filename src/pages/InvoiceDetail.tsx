@@ -71,8 +71,12 @@ export default function InvoiceDetail() {
         <ResizablePanelGroup direction="horizontal" className="h-full rounded-lg">
           <ResizablePanel defaultSize={55} minSize={35}>
             <div className="h-full pr-2">
-              {src ? <InvoiceViewer src={src} /> : (
+              {!src ? (
                 <div className="flex h-full items-center justify-center text-sm text-muted-foreground">No preview</div>
+              ) : (row.file_name?.toLowerCase().endsWith(".pdf")) ? (
+                <iframe src={src} title="Invoice PDF" className="h-full w-full rounded-lg border border-border bg-background" />
+              ) : (
+                <InvoiceViewer src={src} />
               )}
             </div>
           </ResizablePanel>
