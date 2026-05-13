@@ -1,13 +1,14 @@
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { ArrowLeft, Loader2 } from "lucide-react";
+import { toast } from "sonner";
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable";
 import { Button } from "@/components/ui/button";
 import { InvoiceLayout } from "@/components/invoices/InvoiceLayout";
 import { InvoiceHeader } from "@/components/invoices/InvoiceHeader";
 import { InvoiceViewer } from "@/components/invoices/InvoiceViewer";
 import { ExtractedDataCard } from "@/components/invoices/ExtractedDataCard";
-import { getInvoice, getSignedUrl, rowToExtraction, type InvoiceRow } from "@/lib/invoices-api";
+import { getInvoice, getSignedUrl, reExtractInvoice, rowToExtraction, type InvoiceRow } from "@/lib/invoices-api";
 import { supabase } from "@/integrations/supabase/client";
 
 export default function InvoiceDetail() {
