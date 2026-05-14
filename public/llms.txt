@@ -1,8 +1,0 @@
-# Profix
-
-> Hospitality profit intelligence for hotel finance teams. Profix turns daily ops data into USALI-aligned P&L insights, anomaly alerts, and AI-driven cost guidance.
-
-## Pages
-
-- [Home](/): Sign-in entry to the Profix workspace.
-- [Login](/login): Authenticate to access dashboards, P&L, and insights.
