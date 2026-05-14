@@ -65,10 +65,10 @@ const Login = () => {
                 <Input
                   id="username"
                   type="text"
-                  placeholder="inventory / manager / direction"
+                  placeholder="Identity"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
-                  className="pl-10"
+                  className="pl-10 bg-cyan-100"
                 />
               </div>
             </div>
@@ -83,7 +83,7 @@ const Login = () => {
                   placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="pl-10"
+                  className="pl-10 text-[#0df8e4]"
                 />
               </div>
             </div>
