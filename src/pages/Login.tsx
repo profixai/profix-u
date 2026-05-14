@@ -8,6 +8,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth, getLastRoute } from "@/contexts/AuthContext";
 import { GeoBg } from "@/components/GeoBg";
 import { toast } from "sonner";
+import { SEO } from "@/components/SEO";
 
 const roleHome: Record<string, string> = {
   inventory: "/data",
@@ -40,7 +41,12 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background relative overflow-hidden text-slate-200">
+    <main className="min-h-screen flex items-center justify-center bg-background relative overflow-hidden text-slate-200">
+      <SEO
+        title="Sign in to Profix — Hospitality Profit Intelligence"
+        description="Sign in to your Profix workspace to access P&L, dashboards, and AI-driven cost insights for hotel finance teams."
+        path="/login"
+      />
       <GeoBg />
       <motion.div
         initial={{ opacity: 0, y: 20 }}
