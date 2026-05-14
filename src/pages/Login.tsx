@@ -83,7 +83,7 @@ const Login = () => {
                   placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="pl-10"
+                  className="pl-10 text-[#0df8e4]"
                 />
               </div>
             </div>
