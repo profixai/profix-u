@@ -68,7 +68,7 @@ const Login = () => {
                   placeholder="Identity"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
-                  className="pl-10 bg-cyan-100"
+                  className="pl-10 bg-cyan-100 focus-visible:ring-[#0df8e4] focus-visible:ring-offset-0 aria-[invalid=true]:focus-visible:ring-amber-400"
                 />
               </div>
             </div>
@@ -83,7 +83,7 @@ const Login = () => {
                   placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="pl-10 text-[#0df8e4]"
+                  className="pl-10 text-[#0df8e4] focus-visible:ring-[#0df8e4] focus-visible:ring-offset-0 aria-[invalid=true]:focus-visible:ring-amber-400"
                 />
               </div>
             </div>
