@@ -18,6 +18,9 @@ const roleHome: Record<string, string> = {
 const Login = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [usernameError, setUsernameError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+  const [formError, setFormError] = useState("");
   const navigate = useNavigate();
   const { login, user } = useAuth();
 
@@ -30,12 +33,33 @@ const Login = () => {
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
+    let hasError = false;
+    if (!username.trim()) {
+      setUsernameError("Username is required.");
+      hasError = true;
+    } else {
+      setUsernameError("");
+    }
+    if (!password) {
+      setPasswordError("Password is required.");
+      hasError = true;
+    } else {
+      setPasswordError("");
+    }
+    if (hasError) {
+      setFormError("Please fix the highlighted fields.");
+      return;
+    }
+
     const success = login(username, password);
     if (success) {
+      setFormError("");
       const role = username === "inventory" ? "inventory" : username === "manager" ? "manager" : "direction";
       navigate(roleHome[role] || "/overview");
     } else {
-      toast.error("Invalid username or password.");
+      const msg = "Invalid username or password.";
+      setFormError(msg);
+      toast.error(msg);
     }
   };
 
@@ -57,38 +81,75 @@ const Login = () => {
         </div>
 
         <div className="bg-card rounded-xl border p-6 shadow-sm">
-          <form onSubmit={handleLogin} className="space-y-4">
+          <form onSubmit={handleLogin} className="space-y-4" noValidate>
             <div className="space-y-2">
               <Label htmlFor="username" className="text-sm font-medium">Username</Label>
               <div className="relative">
-                <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" aria-hidden="true" />
                 <Input
                   id="username"
                   type="text"
                   placeholder="Identity"
                   value={username}
-                  onChange={(e) => setUsername(e.target.value)}
+                  onChange={(e) => {
+                    setUsername(e.target.value);
+                    if (usernameError) setUsernameError("");
+                  }}
+                  aria-invalid={!!usernameError}
+                  aria-describedby="username-error"
+                  aria-required="true"
                   className="pl-10 bg-cyan-100 focus-visible:ring-[#0df8e4] focus-visible:ring-offset-0 aria-[invalid=true]:focus-visible:ring-amber-400"
                 />
               </div>
+              <p
+                id="username-error"
+                role="alert"
+                aria-live="polite"
+                className="min-h-[1rem] text-xs text-amber-400"
+              >
+                {usernameError}
+              </p>
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="password" className="text-sm font-medium">Password</Label>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" aria-hidden="true" />
                 <Input
                   id="password"
                   type="password"
                   placeholder="••••••••"
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  onChange={(e) => {
+                    setPassword(e.target.value);
+                    if (passwordError) setPasswordError("");
+                  }}
+                  aria-invalid={!!passwordError}
+                  aria-describedby="password-error"
+                  aria-required="true"
                   className="pl-10 text-[#0df8e4] focus-visible:ring-[#0df8e4] focus-visible:ring-offset-0 aria-[invalid=true]:focus-visible:ring-amber-400"
                 />
               </div>
+              <p
+                id="password-error"
+                role="alert"
+                aria-live="polite"
+                className="min-h-[1rem] text-xs text-amber-400"
+              >
+                {passwordError}
+              </p>
             </div>
 
-            <Button type="submit" className="w-full">
+            <p
+              id="form-error"
+              role="alert"
+              aria-live="assertive"
+              className="min-h-[1rem] text-xs text-amber-400 text-center"
+            >
+              {formError}
+            </p>
+
+            <Button type="submit" className="w-full" aria-describedby="form-error">
               Sign in
             </Button>
           </form>
