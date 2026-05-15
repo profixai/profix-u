@@ -21,6 +21,7 @@ const Login = () => {
   const [usernameError, setUsernameError] = useState("");
   const [passwordError, setPasswordError] = useState("");
   const [formError, setFormError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const { login, user } = useAuth();
 
@@ -31,8 +32,9 @@ const Login = () => {
     }
   }, [user, navigate]);
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isLoading) return;
     let hasError = false;
     if (!username.trim()) {
       setUsernameError("Username is required.");
@@ -47,19 +49,26 @@ const Login = () => {
       setPasswordError("");
     }
     if (hasError) {
-      setFormError("Please fix the highlighted fields.");
+      const msg = "Please fix the highlighted fields.";
+      setFormError(msg);
+      toast.error(msg);
       return;
     }
 
-    const success = login(username, password);
-    if (success) {
-      setFormError("");
-      const role = username === "inventory" ? "inventory" : username === "manager" ? "manager" : "direction";
-      navigate(roleHome[role] || "/overview");
-    } else {
-      const msg = "Invalid username or password.";
-      setFormError(msg);
-      toast.error(msg);
+    setIsLoading(true);
+    try {
+      const success = login(username, password);
+      if (success) {
+        setFormError("");
+        const role = username === "inventory" ? "inventory" : username === "manager" ? "manager" : "direction";
+        navigate(roleHome[role] || "/overview");
+      } else {
+        const msg = "Invalid username or password.";
+        setFormError(msg);
+        toast.error(msg);
+      }
+    } finally {
+      setIsLoading(false);
     }
   };
 
