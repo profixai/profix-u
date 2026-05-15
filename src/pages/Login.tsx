@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Lock, User } from "lucide-react";
+import { Lock, User, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -158,8 +158,15 @@ const Login = () => {
               {formError}
             </p>
 
-            <Button type="submit" className="w-full" aria-describedby="form-error">
-              Sign in
+            <Button type="submit" className="w-full" disabled={isLoading} aria-busy={isLoading} aria-describedby="form-error">
+              {isLoading ? (
+                <span className="inline-flex items-center gap-2">
+                  <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
+                  Signing in…
+                </span>
+              ) : (
+                "Sign in"
+              )}
             </Button>
           </form>
 
