@@ -108,6 +108,7 @@ const Login = () => {
                   aria-describedby="username-error"
                   aria-required="true"
                   className="pl-10 bg-cyan-100 focus-visible:ring-[#0df8e4] focus-visible:ring-offset-0 aria-[invalid=true]:focus-visible:ring-amber-400"
+                  disabled={isLoading}
                 />
               </div>
               <p
@@ -137,6 +138,7 @@ const Login = () => {
                   aria-describedby="password-error"
                   aria-required="true"
                   className="pl-10 text-[#0df8e4] focus-visible:ring-[#0df8e4] focus-visible:ring-offset-0 aria-[invalid=true]:focus-visible:ring-amber-400"
+                  disabled={isLoading}
                 />
               </div>
               <p
