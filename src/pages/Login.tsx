@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Lock, User } from "lucide-react";
+import { Lock, User, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -21,6 +21,7 @@ const Login = () => {
   const [usernameError, setUsernameError] = useState("");
   const [passwordError, setPasswordError] = useState("");
   const [formError, setFormError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const { login, user } = useAuth();
 
@@ -31,8 +32,9 @@ const Login = () => {
     }
   }, [user, navigate]);
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isLoading) return;
     let hasError = false;
     if (!username.trim()) {
       setUsernameError("Username is required.");
@@ -47,19 +49,26 @@ const Login = () => {
       setPasswordError("");
     }
     if (hasError) {
-      setFormError("Please fix the highlighted fields.");
+      const msg = "Please fix the highlighted fields.";
+      setFormError(msg);
+      toast.error(msg);
       return;
     }
 
-    const success = login(username, password);
-    if (success) {
-      setFormError("");
-      const role = username === "inventory" ? "inventory" : username === "manager" ? "manager" : "direction";
-      navigate(roleHome[role] || "/overview");
-    } else {
-      const msg = "Invalid username or password.";
-      setFormError(msg);
-      toast.error(msg);
+    setIsLoading(true);
+    try {
+      const success = login(username, password);
+      if (success) {
+        setFormError("");
+        const role = username === "inventory" ? "inventory" : username === "manager" ? "manager" : "direction";
+        navigate(roleHome[role] || "/overview");
+      } else {
+        const msg = "Invalid username or password.";
+        setFormError(msg);
+        toast.error(msg);
+      }
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -99,6 +108,7 @@ const Login = () => {
                   aria-describedby="username-error"
                   aria-required="true"
                   className="pl-10 bg-cyan-100 focus-visible:ring-[#0df8e4] focus-visible:ring-offset-0 aria-[invalid=true]:focus-visible:ring-amber-400"
+                  disabled={isLoading}
                 />
               </div>
               <p
@@ -128,6 +138,7 @@ const Login = () => {
                   aria-describedby="password-error"
                   aria-required="true"
                   className="pl-10 text-[#0df8e4] focus-visible:ring-[#0df8e4] focus-visible:ring-offset-0 aria-[invalid=true]:focus-visible:ring-amber-400"
+                  disabled={isLoading}
                 />
               </div>
               <p
@@ -149,8 +160,15 @@ const Login = () => {
               {formError}
             </p>
 
-            <Button type="submit" className="w-full" aria-describedby="form-error">
-              Sign in
+            <Button type="submit" className="w-full" disabled={isLoading} aria-busy={isLoading} aria-describedby="form-error">
+              {isLoading ? (
+                <span className="inline-flex items-center gap-2">
+                  <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
+                  Signing in…
+                </span>
+              ) : (
+                "Sign in"
+              )}
             </Button>
           </form>
 
