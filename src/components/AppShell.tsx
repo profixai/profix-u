@@ -4,6 +4,7 @@ import { useAuth, UserRole } from "@/contexts/AuthContext";
 import { AskProfixPanel } from "@/components/AskProfixPanel";
 import { ContextBar } from "@/components/ContextBar";
 import { GeoBg } from "@/components/GeoBg";
+import profixLogo from "@/assets/profix-logo.png";
 import { Button } from "@/components/ui/button";
 import {
   LayoutDashboard,
@@ -92,10 +93,13 @@ export const AppShell = ({ children }: AppShellProps) => {
             {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </button>
 
-          <Link to="/" className="flex items-center gap-2">
-            <span className="text-base font-extrabold tracking-widest text-foreground">
-              PROFi<span className="text-primary">X</span>
-            </span>
+          <Link to="/" className="flex items-center gap-2" aria-label="PROFiX home">
+            <img
+              src={profixLogo}
+              alt="PROFiX"
+              className="h-5 w-auto select-none [filter:brightness(0)_invert(1)]"
+              draggable={false}
+            />
           </Link>
         </div>
 
