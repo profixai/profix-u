@@ -92,25 +92,48 @@ const Login = () => {
         <div className="bg-card rounded-xl border p-6 shadow-sm">
           <form onSubmit={handleLogin} className="space-y-4" noValidate>
             <div className="space-y-2">
-              <Label htmlFor="username" className="text-sm font-medium">Username</Label>
+              <Label htmlFor="username" className="text-sm font-medium">
+                Username
+              </Label>
               <div className="relative">
-                <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" aria-hidden="true" />
+                <User
+                  className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground"
+                  aria-hidden="true"
+                />
                 <Input
                   id="username"
+                  name="username"
                   type="text"
+                  inputMode="text"
+                  autoComplete="username"
+                  autoCapitalize="none"
+                  autoCorrect="off"
+                  spellCheck={false}
+                  enterKeyHint="next"
                   placeholder="user ID"
                   value={username}
                   onChange={(e) => {
                     setUsername(e.target.value);
                     if (usernameError) setUsernameError("");
+                    if (formError) setFormError("");
+                  }}
+                  onBlur={() => {
+                    if (username && username !== username.trim()) {
+                      setUsername(username.trim());
+                    }
                   }}
                   aria-invalid={!!usernameError}
-                  aria-describedby="username-error"
+                  aria-describedby="username-hint username-error"
                   aria-required="true"
+                  required
+                  maxLength={64}
                   className="pl-10 bg-cyan-100 focus-visible:ring-[#0df8e4] focus-visible:ring-offset-0 aria-[invalid=true]:focus-visible:ring-amber-400 text-slate-800"
                   disabled={isLoading}
                 />
               </div>
+              <p id="username-hint" className="text-xs text-muted-foreground">
+                Use the identity assigned to your role (e.g. inventory, manager, direction).
+              </p>
               <p
                 id="username-error"
                 role="alert"
