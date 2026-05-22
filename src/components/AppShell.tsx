@@ -4,6 +4,7 @@ import { useAuth, UserRole } from "@/contexts/AuthContext";
 import { AskProfixPanel } from "@/components/AskProfixPanel";
 import { ContextBar } from "@/components/ContextBar";
 import { GeoBg } from "@/components/GeoBg";
+import profixLogo from "@/assets/profix-logo.png";
 import { Button } from "@/components/ui/button";
 import {
   LayoutDashboard,
