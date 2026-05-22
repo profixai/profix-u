@@ -127,17 +127,14 @@ const Login = () => {
                     }
                   }}
                   aria-invalid={!!usernameError}
-                  aria-describedby="username-hint username-error"
+                  aria-describedby="username-error"
                   aria-required="true"
                   required
                   maxLength={64}
-                  className="pl-10 bg-cyan-100 focus-visible:ring-[#0df8e4] focus-visible:ring-offset-0 aria-[invalid=true]:focus-visible:ring-amber-400 text-slate-800"
+                  className="pl-10 text-[#0df8e4] focus-visible:ring-[#0df8e4] focus-visible:ring-offset-0 aria-[invalid=true]:focus-visible:ring-amber-400"
                   disabled={isLoading}
                 />
               </div>
-              <p id="username-hint" className="text-xs text-muted-foreground">
-                Use the identity assigned to your role (e.g. inventory, manager, direction).
-              </p>
               <p
                 id="username-error"
                 role="alert"
