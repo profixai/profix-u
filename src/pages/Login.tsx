@@ -98,7 +98,7 @@ const Login = () => {
                 <Input
                   id="username"
                   type="text"
-                  placeholder="Identity"
+                  placeholder="user ID"
                   value={username}
                   onChange={(e) => {
                     setUsername(e.target.value);
@@ -107,7 +107,7 @@ const Login = () => {
                   aria-invalid={!!usernameError}
                   aria-describedby="username-error"
                   aria-required="true"
-                  className="pl-10 bg-cyan-100 focus-visible:ring-[#0df8e4] focus-visible:ring-offset-0 aria-[invalid=true]:focus-visible:ring-amber-400"
+                  className="pl-10 bg-cyan-100 focus-visible:ring-[#0df8e4] focus-visible:ring-offset-0 aria-[invalid=true]:focus-visible:ring-amber-400 text-slate-800"
                   disabled={isLoading}
                 />
               </div>
