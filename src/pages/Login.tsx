@@ -82,10 +82,13 @@ const Login = () => {
         className="w-full max-w-sm relative z-10"
       >
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-extrabold tracking-widest text-foreground">
-            PROFi<span className="text-primary">X</span>
-          </h1>
-          <p className="text-sm text-primary mt-1 tracking-wide">AI-Driven Cost Clarity</p>
+          <img
+            src={profixLogo}
+            alt="PROFiX"
+            className="mx-auto h-10 w-auto select-none [filter:brightness(0)_invert(1)]"
+            draggable={false}
+          />
+          <p className="text-sm text-primary mt-3 tracking-wide">AI-Driven Cost Clarity</p>
           <p className="text-xs text-muted-foreground">For Hotel Finance Teams</p>
         </div>
 
