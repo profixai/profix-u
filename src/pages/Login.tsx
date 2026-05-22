@@ -8,6 +8,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth, getLastRoute } from "@/contexts/AuthContext";
 import { GeoBg } from "@/components/GeoBg";
 import { toast } from "sonner";
+import profixLogo from "@/assets/profix-logo.png";
 
 const roleHome: Record<string, string> = {
   inventory: "/data",
