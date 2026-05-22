@@ -21,12 +21,13 @@ import InvoicesInbox from "./pages/InvoicesInbox";
 import NotFound from "./pages/NotFound";
 import WhyProfix from "./pages/WhyProfix";
 import Upgrade from "./pages/Upgrade";
+import Landing from "./pages/Landing";
 
 const queryClient = new QueryClient();
 
 const RootRedirect = () => {
   const { user } = useAuth();
-  if (!user) return <Navigate to="/login" replace />;
+  if (!user) return <Landing />;
   if (user.role === "inventory") return <Navigate to="/data" replace />;
   return <Navigate to="/overview" replace />;
 };
